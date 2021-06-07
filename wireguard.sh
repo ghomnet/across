@@ -293,7 +293,9 @@ install_wg_pkgs() {
             _error_detect "yum -y install gcc"
             _error_detect "yum -y install make"
             _error_detect "yum -y install yum-utils"
-            [ -n "$(_os_ver)" -a "$(_os_ver)" -eq 8 ] && _error_detect "yum-config-manager --enable PowerTools"
+            if [ -n "$(_os_ver)" -a "$(_os_ver)" -eq 8 ]; then
+                yum-config-manager --enable PowerTools > /dev/null 2>&1 || yum-config-manager --enable powertools > /dev/null 2>&1
+            fi
             _error_detect "yum -y install libmnl-devel"
             _error_detect "yum -y install elfutils-libelf-devel"
             [ ! -d "/usr/src/kernels/$(uname -r)" ] && _error_detect "yum -y install kernel-headers" && _error_detect "yum -y install kernel-devel"
@@ -451,6 +453,7 @@ PrivateKey = ${SERVER_PRIVATE_KEY}
 PublicKey = ${CLIENT_PUBLIC_KEY}
 AllowedIPs = ${CLIENT_WG_IPV4}/32,${CLIENT_WG_IPV6}/128
 PresharedKey = ${CLIENT_PRE_SHARED_KEY}
+PersistentKeepalive = 25
 EOF
     else
         cat > /etc/wireguard/${SERVER_WG_NIC}.conf <<EOF
@@ -463,6 +466,7 @@ PrivateKey = ${SERVER_PRIVATE_KEY}
 PublicKey = ${CLIENT_PUBLIC_KEY}
 AllowedIPs = ${CLIENT_WG_IPV4}/32
 PresharedKey = ${CLIENT_PRE_SHARED_KEY}
+PersistentKeepalive = 25
 EOF
     fi
     chmod 600 /etc/wireguard/${SERVER_WG_NIC}.conf
@@ -656,6 +660,7 @@ EOF
 PublicKey = ${CLIENT_PUBLIC_KEY}
 AllowedIPs = ${CLIENT_WG_IPV4}/32,${CLIENT_WG_IPV6}/128
 PresharedKey = ${CLIENT_PRE_SHARED_KEY}
+PersistentKeepalive = 25
 EOF
     else
         cat > ${new_client_if} <<EOF
@@ -676,6 +681,7 @@ EOF
 PublicKey = ${CLIENT_PUBLIC_KEY}
 AllowedIPs = ${CLIENT_WG_IPV4}/32
 PresharedKey = ${CLIENT_PRE_SHARED_KEY}
+PersistentKeepalive = 25
 EOF
     fi
     chmod 600 ${new_client_if}
